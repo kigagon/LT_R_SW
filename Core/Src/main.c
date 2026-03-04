@@ -441,7 +441,7 @@ int main(void)
 	     }
 
 	     // 수신 완료 신호 기다리기
-
+/*
 	     for(int i=0;i<400;i++){
 	       if(rx1_Receive_complete == 1){
 	         UI_Com();
@@ -451,7 +451,7 @@ int main(void)
 	       }
 	       HAL_Delay(1);
 	     }
-
+*/
 
   }
   /* USER CODE END 3 */
@@ -764,6 +764,16 @@ void UI_Com(void){
          UI_Com_SW_S();		//0x53 , 'S' Switch board 정보
       }
       else if(Uart_rx1_buf[4] == 0x4D){
+
+		  if(Uart_rx1_buf[12] == 0){
+			Sub_MCC_Set_Num = 1;
+			Sub_Relay_Set_Num = 1;
+		  }
+		  else{
+			Sub_MCC_Set_Num = Uart_rx1_buf[12];
+			Sub_Relay_Set_Num = Uart_rx1_buf[12];
+		  }
+
         UI_Com_MCC_S(Uart_rx1_buf[5]);		//0x4C , 'M' ,MCC board 정보
         UI_Com_MCC_Q(Uart_rx1_buf[5]);
         //Run_Sub_LDT();
@@ -911,7 +921,16 @@ void UI_Com_MCC_Q(int Address){
 
   TX_LED(GPIO_PIN_RESET);
 
-
+  /*
+  if(Sub_MCC_R_Data[Address-1][12] == 0){
+    Sub_MCC_Set_Num = 1;
+    Sub_Relay_Set_Num = 1;
+  }
+  else{
+    Sub_MCC_Set_Num = Sub_MCC_R_Data[Address-1][12];
+    Sub_Relay_Set_Num = Sub_MCC_R_Data[Address-1][12];
+  }
+*/
   for(i=0;i<Uart1_length_MCC;i++){
     Uart1_tx_data[i] = 0;
   }
