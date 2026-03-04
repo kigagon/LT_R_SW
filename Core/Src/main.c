@@ -435,13 +435,24 @@ int main(void)
 	       if(rx1_Receive_complete == 1){
 	         UI_Com();
 	         loop_out = 0;
-	         break;
+//	         break;
 	       }
 	       HAL_Delay(1);
 	     }
 
 	     // 수신 완료 신호 기다리기
-/*
+
+	     if(loop_out == 1){
+		     for(int i=0;i<250;i++){
+		       if(rx1_Receive_complete == 1){
+		         UI_Com();
+		         loop_out = 0;
+	//	         break;
+		       }
+		       HAL_Delay(1);
+		     }
+	     }
+	     /*
 	     for(int i=0;i<400;i++){
 	       if(rx1_Receive_complete == 1){
 	         UI_Com();
@@ -451,7 +462,8 @@ int main(void)
 	       }
 	       HAL_Delay(1);
 	     }
-*/
+	     */
+
 
   }
   /* USER CODE END 3 */
