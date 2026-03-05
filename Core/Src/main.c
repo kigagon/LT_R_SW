@@ -364,7 +364,7 @@ int main(void)
 	  /* Enable the UART Data Register not empty Interrupt */
 	  __HAL_UART_ENABLE_IT(&huart2, UART_IT_RXNE);
 
-//	  Read_Sub_Version();
+	  Read_Sub_Version();
 
 
 	    Read_Ext_TB_Status();
