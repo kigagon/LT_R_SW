@@ -343,6 +343,7 @@ int main(void)
 
   Compile_Date();
   Read_Sub_Version();
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -363,30 +364,31 @@ int main(void)
 	  /* Enable the UART Data Register not empty Interrupt */
 	  __HAL_UART_ENABLE_IT(&huart2, UART_IT_RXNE);
 
-	  Read_Sub_Version();
+//	  Read_Sub_Version();
 
 
 	    Read_Ext_TB_Status();
-	    HAL_Delay(1);
+	    Ck_UI_Com();
+
 	    Read_EB_Status();
-	    HAL_Delay(1);
+	    Ck_UI_Com();
 
 	    for(int i=1;i<Sub_DO24_Set_Num +1;i++){
 	      for(int k=0; k<2;k++){
 	        Sub_DO24_state[i-1] = Read_DO24_Status(i);
-	        HAL_Delay(1);
+	        Ck_UI_Com();
 	        if(Sub_DO24_state[i-1]  == 1){
 	          break;
 	        }
 	      }
-	      HAL_Delay(1);
+	      Ck_UI_Com();
 	    }
 	  //  HAL_Delay(10);
 	    for(int i=1;i<Sub_MCC_Set_Num +1;i++){
 
 	      for(int k=0; k<2;k++){
 	        Sub_MCC_state[i-1] = Read_MCC_Status(i);
-	        HAL_Delay(1);
+	        Ck_UI_Com();
 	        if(Sub_MCC_state[i-1]  == 1){
 	          break;
 	        }
@@ -397,37 +399,42 @@ int main(void)
 	      }
 
 	      Set_Led_Data(i);
-	      HAL_Delay(1);
+	      Ck_UI_Com();
 	    }
 	   // HAL_Delay(10);
 	    for(int i=1;i<Sub_Relay_Set_Num +1;i++){
 	      Sub_Relay_state[i-1] = Read_MCC_R_Status(i);
 	      Set_pump(i);    //펌프 설정
-	      HAL_Delay(1);
+	      Ck_UI_Com();
 	    }
 
 
 	      // HAL_Delay(10);
 	    for(int i=1;i<Sub_Relay_Set_Num +1;i++){
 	      Sub_Relay_state[i-1] = Read_MCC_R_Status(i);
+	      UI_Com_MCC_S_Relay_val(i);        // Relay의 값을 mcc에 적용
+	      HAL_Delay(10);
+
 	      Set_pump(i);    //펌프 설정
-	      HAL_Delay(1);
+	      UI_Com_MCC_S_Relay_val(i);        // Relay의 값을 mcc에 적용
+	      Ck_UI_Com();
+	      HAL_Delay(10);
 	    }
 
 	    //HAL_Delay(10);
-
+/*
 	    for(int i=1;i<Sub_Relay_Set_Num +1;i++){
 	      UI_Com_MCC_S_Relay_val(i);        // Relay의 값을 mcc에 적용
-	      HAL_Delay(1);
+	      Ck_UI_Com();
 	    }
 	    //HAL_Delay(10);
 
 	     for(int i=1;i<Sub_Relay_Set_Num +1;i++){
 	      UI_Com_MCC_S_Relay_val(i);        // Relay의 값을 mcc에 적용
-	      HAL_Delay(1);
+	      Ck_UI_Com();
 	    }
 	    //HAL_Delay(10);
-
+*/
 
 	     UI_Com_SW_r();
 	     loop_out = 1;
@@ -441,18 +448,7 @@ int main(void)
 	     }
 
 	     // 수신 완료 신호 기다리기
-
-	     if(loop_out == 1){
-		     for(int i=0;i<250;i++){
-		       if(rx1_Receive_complete == 1){
-		         UI_Com();
-		         loop_out = 0;
-	//	         break;
-		       }
-		       HAL_Delay(1);
-		     }
-	     }
-	     /*
+/*
 	     for(int i=0;i<400;i++){
 	       if(rx1_Receive_complete == 1){
 	         UI_Com();
@@ -462,7 +458,7 @@ int main(void)
 	       }
 	       HAL_Delay(1);
 	     }
-	     */
+*/
 
 
   }
@@ -746,6 +742,7 @@ void UI_Com(void){
           }
 
           UI_Com_Relay_Q(i);
+
         }
 
       }
@@ -2054,43 +2051,41 @@ int Read_MCC_R_Status(int Address){
 
 void Set_Led_Data(int Address){
 
-
-
   PUMP_AUTO_set[Address-1][0] = (LED_Data_Set[Address-1][0] >> 7) & 0x01 ;//-> PUMP1_AUTO
   PUMP_STOP_set[Address-1][0] = (LED_Data_Set[Address-1][0] >> 6) & 0x01 ;//-> PUMP1_STOP
   PUMP_MANUAL_set[Address-1][0] = (LED_Data_Set[Address-1][0] >> 5) & 0x01 ;//-> PUMP1_MANUAL
-  PUMP_CHECK_set[Address-1][0] = (LED_Data_Set[Address-1][0] >> 4) & 0x01 ;//-> PUMP1_CHECK
-  PUMP_PS_set[Address-1][0] = (LED_Data_Set[Address-1][0] >> 3) & 0x01 ;//-> PUMP1_PS
+//  PUMP_CHECK_set[Address-1][0] = (LED_Data_Set[Address-1][0] >> 4) & 0x01 ;//-> PUMP1_CHECK
+//  PUMP_PS_set[Address-1][0] = (LED_Data_Set[Address-1][0] >> 3) & 0x01 ;//-> PUMP1_PS
 
   PUMP_AUTO_set[Address-1][1] = (LED_Data_Set[Address-1][0] >> 2) & 0x01 ;//-> PUMP2_AUTO
   PUMP_STOP_set[Address-1][1] = (LED_Data_Set[Address-1][0] >> 1) & 0x01 ;//-> PUMP2_STOP
   PUMP_MANUAL_set[Address-1][1] = (LED_Data_Set[Address-1][0] >> 0) & 0x01 ;//-> PUMP2_MANUAL
-  PUMP_CHECK_set[Address-1][1] = (LED_Data_Set[Address-1][1] >> 7) & 0x01 ;//-> PUMP2_CHECK
-  PUMP_PS_set[Address-1][1] = (LED_Data_Set[Address-1][1] >> 6) & 0x01 ;//-> PUMP2_PS
+//  PUMP_CHECK_set[Address-1][1] = (LED_Data_Set[Address-1][1] >> 7) & 0x01 ;//-> PUMP2_CHECK
+//  PUMP_PS_set[Address-1][1] = (LED_Data_Set[Address-1][1] >> 6) & 0x01 ;//-> PUMP2_PS
 
   PUMP_AUTO_set[Address-1][2] = (LED_Data_Set[Address-1][1] >> 5) & 0x01 ;//-> PUMP3_AUTO
   PUMP_STOP_set[Address-1][2] = (LED_Data_Set[Address-1][1] >> 4) & 0x01 ;//-> PUMP3_STOP
   PUMP_MANUAL_set[Address-1][2] = (LED_Data_Set[Address-1][1] >> 3) & 0x01 ;//-> PUMP3_MANUAL
-  PUMP_CHECK_set[Address-1][2] = (LED_Data_Set[Address-1][1] >> 2) & 0x01 ;//-> PUMP3_CHECK
-  PUMP_PS_set[Address-1][2] = (LED_Data_Set[Address-1][1] >> 1) & 0x01 ;//-> PUMP3_PS
+//  PUMP_CHECK_set[Address-1][2] = (LED_Data_Set[Address-1][1] >> 2) & 0x01 ;//-> PUMP3_CHECK
+//  PUMP_PS_set[Address-1][2] = (LED_Data_Set[Address-1][1] >> 1) & 0x01 ;//-> PUMP3_PS
 
   PUMP_AUTO_set[Address-1][3] = (LED_Data_Set[Address-1][1] >> 0) & 0x01 ;//-> PUMP4_AUTO
   PUMP_STOP_set[Address-1][3] = (LED_Data_Set[Address-1][2] >> 7) & 0x01 ;//-> PUMP4_STOP
   PUMP_MANUAL_set[Address-1][3] = (LED_Data_Set[Address-1][2] >> 6) & 0x01 ;//-> PUMP4_MANUAL
-  PUMP_CHECK_set[Address-1][3] = (LED_Data_Set[Address-1][2] >> 5) & 0x01 ;//-> PUMP4_CHECK
-  PUMP_PS_set[Address-1][3] = (LED_Data_Set[Address-1][2] >> 4) & 0x01 ;//-> PUMP4_PS
+//  PUMP_CHECK_set[Address-1][3] = (LED_Data_Set[Address-1][2] >> 5) & 0x01 ;//-> PUMP4_CHECK
+//  PUMP_PS_set[Address-1][3] = (LED_Data_Set[Address-1][2] >> 4) & 0x01 ;//-> PUMP4_PS
 
   PUMP_AUTO_set[Address-1][4] = (LED_Data_Set[Address-1][2] >> 3) & 0x01 ;//-> PUMP5_AUTO
   PUMP_STOP_set[Address-1][4] = (LED_Data_Set[Address-1][2] >> 2) & 0x01 ;//-> PUMP5_STOP
   PUMP_MANUAL_set[Address-1][4] = (LED_Data_Set[Address-1][2] >> 1) & 0x01 ;//-> PUMP5_MANUAL
-  PUMP_CHECK_set[Address-1][4] = (LED_Data_Set[Address-1][2] >> 0) & 0x01 ;//-> PUMP5_CHECK
-  PUMP_PS_set[Address-1][4] = (LED_Data_Set[Address-1][3] >> 7) & 0x01 ;//-> PUMP5_PS
+//  PUMP_CHECK_set[Address-1][4] = (LED_Data_Set[Address-1][2] >> 0) & 0x01 ;//-> PUMP5_CHECK
+//  PUMP_PS_set[Address-1][4] = (LED_Data_Set[Address-1][3] >> 7) & 0x01 ;//-> PUMP5_PS
 
   PUMP_AUTO_set[Address-1][5] = (LED_Data_Set[Address-1][3] >> 6) & 0x01 ;//-> PUMP6_AUTO
   PUMP_STOP_set[Address-1][5] = (LED_Data_Set[Address-1][3] >> 5) & 0x01 ;//-> PUMP6_STOP
   PUMP_MANUAL_set[Address-1][5] = (LED_Data_Set[Address-1][3] >> 4) & 0x01 ;//-> PUMP6_MANUAL
-  PUMP_CHECK_set[Address-1][5] = (LED_Data_Set[Address-1][3] >> 3) & 0x01 ;//-> PUMP6_CHECK
-  PUMP_PS_set[Address-1][5] = (LED_Data_Set[Address-1][3] >> 2) & 0x01 ;//-> PUMP6_PS
+ // PUMP_CHECK_set[Address-1][5] = (LED_Data_Set[Address-1][3] >> 3) & 0x01 ;//-> PUMP6_CHECK
+//  PUMP_PS_set[Address-1][5] = (LED_Data_Set[Address-1][3] >> 2) & 0x01 ;//-> PUMP6_PS
 
   //MCC_HANJUN_set[Address-1] = (LED_Data_Set[Address-1][3] >> 1) & 0x01 ;//-> HANJUN
   //MCC_BALJUN_set[Address-1] = (LED_Data_Set[Address-1][3] >> 0) & 0x01 ;//-> BALJUN
@@ -2551,6 +2546,17 @@ void Send_Version_UI_TX(uint8_t Board_Name){
 	  }
 
 }
+
+void Ck_UI_Com(void){
+
+	if(rx1_Receive_complete == 1){
+	 UI_Com();
+   }
+
+	HAL_Delay(1);
+}
+
+
 
 /* USER CODE END 4 */
 

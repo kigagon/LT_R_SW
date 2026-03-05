@@ -184,6 +184,8 @@ void Set_pump(int Address);
 void UI_Com_V(void);
 void Send_Version_UI_TX(uint8_t Board_Name);
 
+void Ck_UI_Com(void);
+
 extern  char MENU_POPUP_LED_mode;
 extern  char MAIN_BELL_LED_mode;
 extern  char SUB_BELL_LED_mode;
